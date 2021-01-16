@@ -1,6 +1,7 @@
 package com.javainuse.config;
 
 import com.javainuse.dto.ErrorData;
+import com.javainuse.dto.ExceptionType;
 import com.javainuse.response.Response;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class AppResponseAdvice implements ResponseBodyAdvice<Object> {
         }else{
             output.setStatus(false);
             output.setError((ErrorData) body);
+            output.setExceptionType(ExceptionType.ERROR);
         }
         return output;
     }
