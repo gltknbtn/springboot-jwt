@@ -1,6 +1,7 @@
 package com.javainuse.config;
 
 import com.javainuse.dto.ErrorData;
+import exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 //@ControllerAdvice(basePackageClasses = AcmeController.class)
 @ControllerAdvice
@@ -16,9 +18,16 @@ public class AppControllerExceptionHandlerAdvice extends ResponseEntityException
 
     @ExceptionHandler
     @ResponseBody
-    ResponseEntity<ErrorData> handleControllerException(HttpServletRequest request, Throwable ex) {
+    ResponseEntity<Object> handleControllerException(HttpServletRequest request, Throwable ex) {
+        ResponseEntity<Object> rsp;
         HttpStatus status = getStatus(request);
-        return new ResponseEntity<>(ErrorData.builder().errorCode(100).errorDesc(ex.getMessage()).build(), status);
+        if(ex instanceof ValidationException){
+            List<String> validations = ((ValidationException) ex).getValidations();
+            rsp = new ResponseEntity<>(validations, HttpStatus.BAD_REQUEST);
+        }else{
+            rsp = new ResponseEntity<>(ErrorData.builder().errorCode(100).errorDesc(ex.getMessage()).build(), status);
+        }
+        return rsp;
     }
 
     private HttpStatus getStatus(HttpServletRequest request) {

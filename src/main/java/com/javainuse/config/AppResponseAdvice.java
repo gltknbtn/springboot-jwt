@@ -13,6 +13,8 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import java.util.List;
+
 @ControllerAdvice
 public class AppResponseAdvice implements ResponseBodyAdvice<Object> {
 
@@ -31,6 +33,14 @@ public class AppResponseAdvice implements ResponseBodyAdvice<Object> {
         if(HttpStatus.OK.value() == status){
             output.setStatus(true);
             output.setData(body);
+        }else if(HttpStatus.UNAUTHORIZED.value() == status){
+            output.setStatus(false);
+            output.setError(ErrorData.builder().errorCode(401).errorDesc(body.toString()).build());
+            output.setExceptionType(ExceptionType.ERROR);
+        }else if(HttpStatus.BAD_REQUEST.value() == status){
+            output.setStatus(false);
+            output.setValidations((List<String>) body);
+            output.setExceptionType(ExceptionType.VALIDATION);
         }else{
             output.setStatus(false);
             output.setError((ErrorData) body);

@@ -2,6 +2,7 @@ package com.javainuse.service;
 
 import java.util.ArrayList;
 
+import exception.RTBusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,6 +34,10 @@ public class JwtUserDetailsService implements UserDetailsService {
 	}
 	
 	public User save(UserDTO user) {
+		User usr = userRepository.findByUsername(user.getUsername());
+		if(usr != null){
+			throw new RTBusinessException("User already exist");
+		}
 		User newUser = new User();
 		newUser.setUsername(user.getUsername());
 		newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
